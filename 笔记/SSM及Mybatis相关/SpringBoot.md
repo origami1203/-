@@ -726,7 +726,7 @@ PUT、DELETE需要使用表单的POST方式，添加隐藏域，指定提交方�
 spring:
     datasource:
         driver-class-name: com.mysql.jdbc.Driver
-        url: jdbc:mysql://192.168.128.100:3306/db1
+        url: jdbc:mysql://localhost:3306/halo?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8
         username: root
         password: 1234
         # 除去默认支持的连接池，其他数据库连接池需要指定type(全限定类名)
@@ -740,8 +740,6 @@ Druid的其他属性设置可参考Druid Wiki，[Druid DataSource 配置]([https
 ```yaml
 spring:
   datasource:
-  
-
     druid:
         # 连接池设置，与dbcp类似，此处也可配置url，username，password，先读取此处，若没有，读取spring.datasource下的
         initial-size: 10
