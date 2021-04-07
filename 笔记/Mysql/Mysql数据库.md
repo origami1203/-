@@ -75,8 +75,9 @@ int(5)，后面的数据表示要显示的位数
 - 用于操作数据库,数据表
 
 	- 对数据库和表结构的修改
-	- create  drop  alter
-
+	
+- create  drop  alter
+	
 - 数据库CRUD
 
 	- 创建数据库
@@ -107,52 +108,55 @@ int(5)，后面的数据表示要显示的位数
 
 	- 查看当前数据库内所有数据表
 
-		- SHOW TABLES;
+	```mysql
+SHOW TABLES;
+	```
 
 	- 查询表结构
 
 		- DESC 表名;
 
 	- 创建数据表
-
-	  - ```mysql
-        CREATE TABLE 表名 (
-        	列名1 列数据类型1,
-        	列名2 列数据类型2,
-        	......
-  	列名n 列数据类型n
-  )ENGINE=innodb DEFALUT CHARSET= utf8;
+      
+        - ```mysql
+          CREATE TABLE 表名 (
+	        列名1 列数据类型1,
+            列名2 列数据类型2,
+	        ......
+             列名n 列数据类型n
+	    )ENGINE=innodb DEFALUT CHARSET= utf8;
 	    ```
-
-	  >   注意  : 最后一个列不要加逗号
-
-	- 复制表
-
-		- CREATE TABLE 表名 LIKE 被复制的表名;
-
-	- 删除表
-
-		- DROP TABLE 表名;
-
-	- 修改表
-
-		- 修改表名
-
-			- ALTER TABLE 表名 RENAME TO 新的表名;
-
-		- 修改编码
-
-			- ALTER TABLE 表名 CHARACTER SET 字符集;
-
-		- 在表中添加列
-
+	>    注意  : 最后一个列不要加逗号
+	
+- 复制表
+	
+	- CREATE TABLE 表名 LIKE 被复制的表名;
+	
+- 删除表
+	
+	- DROP TABLE 表名;
+	
+- 修改表
+	
+	- 修改表名
+	
+	```mysql
+	ALTER TABLE 表名 RENAME TO 新的表名;
+	```
+	
+	- 修改编码
+	
+		- ALTER TABLE 表名 CHARACTER SET 字符集;
+	
+	- 在表中添加列
+	
 			- ALTER TABLE 表名 ADD 列名 数据类型;
 
 		- 修改列名或数据类型
 	
 		- ALTER TABLE 表名 CHANGE 列名 新列名 新数据类型;
 			- ALTER TABLE 表名 MODIFY 列名 新数据类型;
-
+	
 		- 删除表中某列
 	
 			- ALTER TABLE 表名 DROP 列名;
@@ -162,25 +166,27 @@ int(5)，后面的数据表示要显示的位数
 - 用于增删改数据表中的数据
 
 	- 对表中数据的操作
-	- iinsect delete update
-
+	
+- iinsect delete update
+	
 - 添加数据
 
   - ```mysql
     INSERT INTO 表名(
-  	列名1,列名2,...列名n
-    ) VALUES(
-  	值1,值2,...值n
-  );
+        列名1,列名2,...列名n
+        ) VALUES(
+    	值1,值2,...值n
+    );
     ```
-    
+  
   >   列名与值要一一对应
-    >   除数字类型外.其它类型需要使用引号
-    
-  - INSERT INTO 表名 VALUES(值1,值2,...值n);
-
-    此种格式要把所有的列表的值都给出
-
+  >   除数字类型外.其它类型需要使用引号
+  
+    ```mysql
+  # 此种格式要把所有的列表的值都给出
+  INSERT INTO 表名 VALUES(值1,值2,...值n);
+    ```
+  
 - 删除数据
 
 	- DELETE FROM 表名 [ WHERE 条件 ]
@@ -221,8 +227,9 @@ int(5)，后面的数据表示要显示的位数
   - 去除重复
 
   	- 使用关键字DISTINCT
-  	- `SELECT DISTINCT 字段 FROM 表名;`
-
+  	
+  - `SELECT DISTINCT 字段 FROM 表名;`
+  	
   - 列数据计算
 
     - ```mysql
@@ -397,8 +404,9 @@ MODIFY
 - 特点
 
 	- 被修饰列的值不能重复
-	- 多个null值不为重复
-
+	
+- 多个null值不为重复
+	
 - 创建表时添加约束
 
   - 列名与数据类型后添加UNIQUE

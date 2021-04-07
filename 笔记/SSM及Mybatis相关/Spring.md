@@ -85,7 +85,8 @@ Spring IoC 容器管理一个或多个 beans。这些 beans 是使用您提供�
       ```xml
       # 为名为fromName的bean添加一个名为toName的别名
       <alias name="fromName" alias="toName"/>
-		```
+	  ```
+	
 
  ##### 实例化Bean对象
 
@@ -102,6 +103,7 @@ Spring IoC 容器管理一个或多个 beans。这些 beans 是使用您提供�
   * **工厂的实例化**
 
     * 普通工厂的实例化
+    
     	```java
     //若在com.example包下有一个工厂UserFactory用于构建User
     public class UserFactory {
@@ -111,8 +113,9 @@ Spring IoC 容器管理一个或多个 beans。这些 beans 是使用您提供�
     }
     	```
     	
-    	配置`<bean>`
-
+	
+    配置`<bean>`
+    	
     	```xml
     <bean id='user' class="com.example.UserFactory"/>
     	```
@@ -129,7 +132,6 @@ Spring IoC 容器管理一个或多个 beans。这些 beans 是使用您提供�
     	# factory-bean指向工厂的id，factory-mothod指向工厂的方法
     	<bean id="user" factory-bean="userFactory" factory-mothod="getUser"/>
     	```
-    	
     
 * **静态工厂的实例化**
 
@@ -534,7 +536,7 @@ public class User {
 * 用于主配置类上，便于同时加载多个子配置类。
 * 用于==@Configuration类==上，将指定类加入ioc容器，类似于@Bean，spring4.2以前只可导入配置类，之后可以导入普通类
 * **==导入`ImportSelecto`或`ImportBeanDefinitionRegistrar`的实现类==**
-    
+  
     * 实现ImportSelector接口可以个性化加载类
     
         ```java
@@ -742,7 +744,7 @@ xml详细配置
 
 	* id属性：是给切面提供一个唯一标识
 * ref属性：是指定通知(增强)类bean的Id。
-	
+
 1. 在`<aop:aspect>`切面标签的内部使用对应标签来配置通知的类型
    * `<aop:before>`：表示配置前置通知
    * `<aop:after-returning>`：表示配置后置通知
@@ -800,6 +802,8 @@ public Object around(ProceedingJoinPoint pjt) {
         Object[] args = pjt.getArgs();
         try {
               //此处若有增强代码则为前置通知
+            
+            // 调用原方法
             result = pjt.proceed(args);
               //此处若有增强代码则为后置通知
             return result;
@@ -818,13 +822,16 @@ public Object around(ProceedingJoinPoint pjt) {
 
 ==@EnableAspectJAutoPxoxy==
 
-开启基于注解的AOP功能，用于配置类上
+开启基于注解的AOP功能，用于配置类上。
+
+其中有个参数`proxyTargetClass` 赋值为 `true`，如果我们不写参数，默认为 false，若织入表达式不是一个接口，会报错ClassCaseException。这跟Spring AOP 动态代理的机制有关，这个 `proxyTargetClass` 参数决定了代理的机制，==当这个参数为 false 时，通过jdk的基于接口的方式进行织入==，这时候代理生成的是一个接口对象，将这个接口对象强制转换为实现该接口的一个类，自然就抛出了上述类型转换异常。
+反之，`proxyTargetClass` 为 `true`，则会使用 cglib 的动态代理方式，这种方式的缺点是拓展类的方法被`final`修饰时，无法进行织入。
 
 ==@Aspect==
 
 * 用于切面类上(用于增强的类)，表示当前类是一个切面类
 
-注意 ：此类上应该添加@component，使ioc容器接管此类。
+>   注意 ：此类上应该添加@component，使ioc容器接管此类。
 
 ==@Before("xxx")、@AfterTurning("xxx")、@AfterThrowing("xxx")、@After("xxx")、@Around("xxx")==
 
@@ -838,15 +845,44 @@ public Object around(ProceedingJoinPoint pjt) {
 
 * 用于自定义的成员变量上
 
-* xxx为切入点表达式
+* xxx为切入点表达式或以下
 
+* | AspectJ指示器 | 描述                                                         |
+| ------------- | ------------------------------------------------------------ |
+  | arg()         | 限制连接点匹配参数为指定类型的执行方法                       |
+  | @args()       | 限制连接点匹配参数由指定注解标注的执行方法                   |
+  | execution()   | 用于匹配是连接点的执行方法                                   |
+  | this()        | 限制连接点匹配AOP 代理的Bean 引用为指定类型的类              |
+  | target()      | 限制连接点匹配目标对象为指定类型的类                         |
+  | @target()     | 限制连接点匹配特定的执行对象，这些对象对应的类要具备指定类型的注解 |
+  | within()      | 限制连接点匹配指定的类型                                     |
+  | @within()     | 限制连接点匹配指定注解所标注的类型（当使用Spring AOP时，方法定义在由指定的注解所标注的类里） |
+  | @annotation   | 限制匹配带有指定注解连接点                                   |
+  
   ```java
-  //设置切入点
-  @Pointcut("execution(*com.itheima.service.imp1.*.*(..)
+  //设置切入点1
+  @Pointcut("execution( * com.itheima.service.imp1.*.*(..))")
   private void ptl(){}
   
+  @Pointcut("@annotation(run.halo.app.annotation.DisableOnCondition)")
+  private void pt2(){}         
+  
   //其他通知引用切入点，注意要加()
-  @After("pt1()")
+  @After(" pt1() && pt2()")
+  public void test1(){
+      ...
+  }
+  @Around("execution(* com.sharpcj.aopdemo.test1.IBuy.buy(..))")
+  public void xxx(ProceedingJoinPoint pj) {
+      try {
+          System.out.println("Around aaa ...");
+          //  调用原方法，其他代码均为对其的增强
+          pj.proceed();
+          System.out.println("Around bbb ...");
+      } catch (Throwable throwable) {
+          throwable.printStackTrace();
+      }
+  }
   ```
 
 > ==**注意 ：使用注解aop的四个通知注解，spring调用时存在问题，并不是按照前置>后置(异常)>最终的顺序执行，而是先执行最终通知然后才执行后置通知，推荐使用环绕通知进行自定义。**==

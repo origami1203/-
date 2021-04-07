@@ -50,7 +50,6 @@ git diff 文件 --cached/staged(1.6以后版本) : 已暂存，还未提交
 git diff 版本hash 文件名 : 与历史版本比较
 
 # 删除
-rm 文件 : linux的删除命令，需要重新git add
 git rm 文件 : 直接commit即可
 git rm --cached : 从缓存区取消
 

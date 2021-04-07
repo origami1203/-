@@ -392,8 +392,6 @@ union all
 select id from t where num=20    
 ```
 
-
-
 ##### 优化
 
 首先应考虑在 where 及 order by 涉及的列上建立索引

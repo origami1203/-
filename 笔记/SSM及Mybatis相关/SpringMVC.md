@@ -1,10 +1,4 @@
-# SpringMVC
-
-工作原理
-
-
-
-工作流程
+# 工作流程
 
 1. 用户发送请求至前端控制器DispatcherServlet。
 
@@ -28,7 +22,7 @@
 
 11. DispatcherServlet响应用户。
 
-### 使用
+# 使用
 
 1. 创建web项目
 
@@ -132,7 +126,7 @@
 
 restful风格既是没有?和&将请求参数分割，而是直接使用/将参数进行分割
 
-##### URI
+### URI
 
 需要使用@ParhVariable注解
 
@@ -188,9 +182,9 @@ public class WebConfig implements WebMvcConfigurer {
 }
 ```
 
-### 获取参数
+# 获取参数
 
-##### 接收普通字段
+### 接收普通字段
 
 请求方法的形参与表单传递的参数名一致时，可以自动接受到参数。
 
@@ -221,7 +215,7 @@ public String addUser(@Requestparam("username") string name){
 
 > 推荐无论参数名是否一致都使用@RequestParam注解，以明确表示出这是要从前端接受的数据。
 
-##### 接受bean类型
+### 接受bean类型
 
 bean
 
@@ -246,7 +240,7 @@ public class User {
 
 即当表单项的属性与bean对象的属性名称对应时，可以直接将表单想直接封装到bean对象中。
 
-##### 级联bean
+### 级联bean
 
 ```java
 public class User {
@@ -276,7 +270,7 @@ public class Adress {
 
 此时也可以直接放装进User对象，且Adress也被封装。
 
-##### servlet原生Api
+### servlet原生Api
 
 直接在方法的参数上加上想要获取的api即可
 
@@ -290,7 +284,7 @@ public String addUser(User user,HttpServletRequest req) {
 }
 ```
 
-##### 向域对象中存取
+### 向域对象中存取
 
 因为我们没有requset和session对象，所以不能像servelt一样直接存值，可以先用上面获取原生api然后获取requset对象和session对象再存取，也可以使用ModleAndView。
 
@@ -303,7 +297,7 @@ public ModelAndView param（）{
 }
 ```
 
-##### 接收集合
+### 接收集合
 
 ```java
 public class User {
@@ -328,7 +322,7 @@ public class User {
 
 即可将表单中的属性封装到ist和map中。
 
-### 乱码
+# 乱码
 
 之前我们遇到乱码问题，可以在过滤器中配置全局编码，在SprinfMVC中，已经内置了一个过滤器，对编码进行设置，我们只需要在web.xml中添加此过滤器即可。
 
@@ -349,7 +343,7 @@ public class User {
 </filter-mapping>
 ```
 
-### JSON
+# JSON
 
 以键值对的形式
 
@@ -367,7 +361,7 @@ public class User {
   * **==writeValueAsString(Objcet)==** :　将对象转换为json字符串
   * ==**readValue(String, Class)**==： 从json字符串读取并转换为指定的对象
 
-### 注解
+# 注解
 
 ==@Controller==
 
@@ -403,7 +397,7 @@ public class User {
 
 ==@RequestBody==
 
-* 将前端发送的json格式的字符串转换为Java对象
+* 将前端发送的==**json**==格式的字符串转换为Java对象
 
 * 用于形参前，获取请求体，以key=value&key=value形式，==**必须是post请求**==
 
@@ -512,7 +506,7 @@ public class User {
 
 *   用于标注了@ControllerAdvice类的方法上，发生指定异常时执行
 
-### 返回值
+# 返回值
 
 ##### String
 
@@ -528,7 +522,7 @@ public class User {
 
 与String类似，方法内设置返回的页面，返回ModleAndView
 
-### 文件上传
+# 文件上传
 
 ##### 前提
 
@@ -626,7 +620,7 @@ public String fileuoload3(MultipartFile upload) throws Exception {
 
 ```
 
-### 全局异常处理
+# 全局异常处理
 
 出现问题向上抛，直到抛给前端控制器，前端控制器调用异常处理器处理异常。
 
@@ -670,7 +664,7 @@ public class GlobalExceptionHandler {
 }
 ```
 
-### 拦截器
+# 拦截器
 
 拦截器类似于Javaweb中的过滤器，但拦截器是SpringMVC中的特有的，只有在SpringMVC中可以使用，且它只拦截请求，而不像过滤器一样可以拦截任何资源。 
 
@@ -680,3 +674,263 @@ public class GlobalExceptionHandler {
 
 加AOP实现切面增强
 
+# 源码
+
+![image-20201218184958275](E:%5CJava%5Cgit%E8%B5%84%E6%96%99%5C%E7%AC%94%E8%AE%B0%5CSSM%E5%8F%8AMybatis%E7%9B%B8%E5%85%B3%5CSpringMVC.assets%5Cimage-20201218184958275.png)
+
+```java
+public DispatcherServlet {
+
+    doService {
+        // 进行一些配置，request.setAttribute(xxx,xxx)
+        
+        // 执行分发操作
+        doDispatch(request, response);
+        ...
+    }
+
+
+    doDispatch{
+        ...
+        // 获取该request的handler的执行链，HandlerExecutionChain，List<HandlerMapping>
+        mappedHandler = getHandler(processedRequest);
+    }
+
+
+}
+```
+
+### HandleMapping
+
+用于映射url和对应的Controller
+
+![image-20201219103430225](E:%5CJava%5Cgit%E8%B5%84%E6%96%99%5C%E7%AC%94%E8%AE%B0%5CSSM%E5%8F%8AMybatis%E7%9B%B8%E5%85%B3%5CSpringMVC.assets%5Cimage-20201219103430225.png)
+
+```java
+public interface HandlerMapping {
+    
+   	// 其他省略
+
+    // 根据请求获取HandlerExecutionChain
+    @Nullable
+    HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception;
+}
+```
+
+```java
+// HandlerExecutionChain是对handle和拦截器的封装
+public class HandlerExecutionChain {
+
+    private final Object handler;
+
+    @Nullable
+    private List<HandlerInterceptor> interceptorList;
+
+}
+```
+
+AbstractUrLHandlerMapping是根据url查找的抽象类，有BeanNameUrlHandlerMapping和SimpleUrlHandleMapping两个实现类。
+
+在Spring启动过程中，会拿到所有以`/`开头的bean的BeanName，Map<String, Object> handlerMap,其中key为bean的name，value为该bean的类名
+
+##### BeanNameUrlHandlerMapping
+
+获取spring中所有的bean，如果beanName以`/`开头，或是bean的别名以`/`开头，添加到一个list中。
+
+将`localhost:8080/index`与名为`/index`的bean的匹配(该bean需要实现Controller或HttpRequestHandler)。
+
+##### SimpleUrlHandlerMapping
+
+通过xml方式，将url与指定的Controller匹配。
+
+##### RequestMappingHandLerMapping
+
+注解方式，`@controller`
+
+### HandlerAdapter
+
+帮助DispatcherServlet处理映射请求处理程序的适配器，而不用考虑实际调用的是 那种方式。
+
+我们可能使用注解方式，可能使用xml方式，可能继承servlet，可能实现controller或HttpRequestHandler，不同的方式，需要需要不同的执行方式，我们只需调用适配器的handler方法，执行handler。如使用注解方式，则使用RequestMappingmapping，调用**RequestMappingHandlerAdapter**适配器执行方法。**HandlerAdapter.handle()**即是具体执行方法。
+
+### 扩展MVC
+
+实现WebMvcConfigurer类，或者继承WebMvcConfigurationSupport(不推荐)。
+
+```java
+public interface WebMvcConfigurer {
+
+   /**
+    * 配置HandleMapping的路径匹配
+    */
+   default void configurePathMatch(PathMatchConfigurer configurer) {
+   }
+
+   /**
+    * Configure content negotiation options.
+    */
+   default void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+   }
+
+   /**
+    * Configure asynchronous request handling options.
+    */
+   default void configureAsyncSupport(AsyncSupportConfigurer configurer) {
+   }
+
+   /**
+    * Configure a handler to delegate unhandled requests by forwarding to the
+    * Servlet container's "default" servlet. A common use case for this is when
+    * the {@link DispatcherServlet} is mapped to "/" thus overriding the
+    * Servlet container's default handling of static resources.
+    */
+   default void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
+   }
+
+   /**
+    * Add {@link Converter Converters} and {@link Formatter Formatters} in addition to the ones
+    * registered by default.
+    */
+   default void addFormatters(FormatterRegistry registry) {
+   }
+
+   /**
+    * Add Spring MVC lifecycle interceptors for pre- and post-processing of
+    * controller method invocations and resource handler requests.
+    * Interceptors can be registered to apply to all requests or be limited
+    * to a subset of URL patterns.
+    */
+   default void addInterceptors(InterceptorRegistry registry) {
+   }
+
+   /**
+    * Add handlers to serve static resources such as images, js, and, css
+    * files from specific locations under web application root, the classpath,
+    * and others.
+    * @see ResourceHandlerRegistry
+    */
+   default void addResourceHandlers(ResourceHandlerRegistry registry) {
+   }
+
+   /**
+    * Configure cross origin requests processing.
+    * @since 4.2
+    */
+   default void addCorsMappings(CorsRegistry registry) {
+   }
+
+   /**
+    * Configure simple automated controllers pre-configured with the response
+    * status code and/or a view to render the response body. This is useful in
+    * cases where there is no need for custom controller logic -- e.g. render a
+    * home page, perform simple site URL redirects, return a 404 status with
+    * HTML content, a 204 with no content, and more.
+    * @see ViewControllerRegistry
+    */
+   default void addViewControllers(ViewControllerRegistry registry) {
+   }
+
+   /**
+    * Configure view resolvers to translate String-based view names returned from
+    * controllers into concrete {@link org.springframework.web.servlet.View}
+    * implementations to perform rendering with.
+    * @since 4.1
+    */
+   default void configureViewResolvers(ViewResolverRegistry registry) {
+   }
+
+   /**
+    * Add resolvers to support custom controller method argument types.
+    * <p>This does not override the built-in support for resolving handler
+    * method arguments. To customize the built-in support for argument
+    * resolution, configure {@link RequestMappingHandlerAdapter} directly.
+    * @param resolvers initially an empty list
+    */
+   default void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+   }
+
+   /**
+    * Add handlers to support custom controller method return value types.
+    * <p>Using this option does not override the built-in support for handling
+    * return values. To customize the built-in support for handling return
+    * values, configure RequestMappingHandlerAdapter directly.
+    * @param handlers initially an empty list
+    */
+   default void addReturnValueHandlers(List<HandlerMethodReturnValueHandler> handlers) {
+   }
+
+   /**
+    * Configure the {@link HttpMessageConverter HttpMessageConverters} to use for reading or writing
+    * to the body of the request or response. If no converters are added, a
+    * default list of converters is registered.
+    * <p><strong>Note</strong> that adding converters to the list, turns off
+    * default converter registration. To simply add a converter without impacting
+    * default registration, consider using the method
+    * {@link #extendMessageConverters(java.util.List)} instead.
+    * @param converters initially an empty list of converters
+    */
+   default void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+   }
+
+   /**
+    * A hook for extending or modifying the list of converters after it has been
+    * configured. This may be useful for example to allow default converters to
+    * be registered and then insert a custom converter through this method.
+    * @param converters the list of configured converters to extend.
+    * @since 4.1.3
+    */
+   default void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+   }
+
+   /**
+    * Configure exception resolvers.
+    * <p>The given list starts out empty. If it is left empty, the framework
+    * configures a default set of resolvers, see
+    * {@link WebMvcConfigurationSupport#addDefaultHandlerExceptionResolvers(List, org.springframework.web.accept.ContentNegotiationManager)}.
+    * Or if any exception resolvers are added to the list, then the application
+    * effectively takes over and must provide, fully initialized, exception
+    * resolvers.
+    * <p>Alternatively you can use
+    * {@link #extendHandlerExceptionResolvers(List)} which allows you to extend
+    * or modify the list of exception resolvers configured by default.
+    * @param resolvers initially an empty list
+    * @see #extendHandlerExceptionResolvers(List)
+    * @see WebMvcConfigurationSupport#addDefaultHandlerExceptionResolvers(List, org.springframework.web.accept.ContentNegotiationManager)
+    */
+   default void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
+   }
+
+   /**
+    * Extending or modify the list of exception resolvers configured by default.
+    * This can be useful for inserting a custom exception resolver without
+    * interfering with default ones.
+    * @param resolvers the list of configured resolvers to extend
+    * @since 4.3
+    * @see WebMvcConfigurationSupport#addDefaultHandlerExceptionResolvers(List, org.springframework.web.accept.ContentNegotiationManager)
+    */
+   default void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
+   }
+
+   /**
+    * Provide a custom {@link Validator} instead of the one created by default.
+    * The default implementation, assuming JSR-303 is on the classpath, is:
+    * {@link org.springframework.validation.beanvalidation.OptionalValidatorFactoryBean}.
+    * Leave the return value as {@code null} to keep the default.
+    */
+   @Nullable
+   default Validator getValidator() {
+      return null;
+   }
+
+   /**
+    * Provide a custom {@link MessageCodesResolver} for building message codes
+    * from data binding and validation error codes. Leave the return value as
+    * {@code null} to keep the default.
+    */
+   @Nullable
+   default MessageCodesResolver getMessageCodesResolver() {
+      return null;
+   }
+
+}
+```

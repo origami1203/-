@@ -187,6 +187,9 @@ Condition：用来代替notify和notifyAll
 ```java
 final Lock lock = new ReentrantLock();	//获取锁
 lock.lock();	//获取锁
+lock.tryLock();	//尝试获取锁，返回是否成功获取锁
+tryLock(long time, TimeUnit unit);	//尝试获取锁，指定时间内未获取，则返回false
+lockInterruptibly();	//可中断锁，若锁已被获取，可使用threadB.interrupt()方法中断
 lock.unlock();	//释放锁
 
 final Condition condition1 = lock.newCondition();	//获取该锁的监视器状态对象
@@ -199,7 +202,23 @@ condition1.signalAll();	//代替notifyAll
 
 >   **==注意==**
 >
->   多线程间的条件判断必须用while循环来判断，防止虚假唤醒
+>   **多线程间的条件判断必须用while循环来判断，防止虚假唤醒**
+>
+>   **使用Lock必须在try…catch…块中进行，并且将释放锁的操作放在finally块中进行，以保证锁一定被被释放，防止死锁的发生。**
+
+```java
+Lock lock = ...;
+lock.lock();
+try{
+    //处理任务
+}catch(Exception ex){
+
+}finally{
+    lock.unlock();   //释放锁
+}
+```
+
+
 
 ### JUC
 
@@ -305,16 +324,16 @@ public ThreadPoolExecutor(int corePoolSize,	// 线程池中的 常驻核心线�
                           int maximumPoolsize,	// 线程池中的最大允许线程数
                           long keepAliveTime,	// 空闲线程的存活时间
                           TimeUnit unit,	// 存活时间的单位
-                          BlockingQueue<Runnable>workQueue,	//任务队列，存储被提交但尚未被执行的任务
+                          BlockingQueue<Runnable> workQueue,	//任务队列，存储被提交但尚未被执行的任务
                           //SynchronousQueue、LinkedBlockingQueue(此时最大线程数无效)、ArrayBlockingQueue
                           ThreadFactory threadFactory,	// 用于生成线程池中工作线程的线程工厂，用于创建线程，一般默认的即可
                           RejectedExecutionHandler handler) {	// 拒绝策略，表示当队列满了，并且工作线程大于等于线程池的最大线程数（maximumPoolSize)时如何来拒绝请求执行的runnable的策略
-    if(corePoolSize<0|l
-       maximumPoolSize<=0||
-       maximumPoolsize< corepoolsize l1
-       keepAliveTime<e)
-        throw new I1legalArgumentException()；
-        if(workoueue== null lI threadFactory==null Il handler==null)
+    if(corePoolSize < 0 ||
+       maximumPoolSize <= 0 ||
+       maximumPoolsize< corepoolsize ||
+       keepAliveTime < 0)
+        throw new IllegalArgumentException();
+        if(workoueue== null || threadFactory == null || handler == null)
             throw new NullPointerException();
     this.corePoolsize=corePoolSize;
     this.maximumPoolsize=maximumPoolSize;
